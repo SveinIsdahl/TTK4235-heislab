@@ -52,8 +52,8 @@ void elevio_stopLamp(int value);
 
 
 /**
- * @brief elevio_callButton checks if cutton is called 1 ON 0 OFF
- * param[in] floor 1 to 3
+ * @brief elevio_callButton checks if button is called 1 ON 0 OFF
+ * param[in] floor 0 to 3
  * param[in] ButtonType either UP, DOWN or CAB
  */
 int elevio_callButton(int floor, ButtonType button);

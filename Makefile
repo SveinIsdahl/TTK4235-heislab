@@ -1,7 +1,7 @@
 
 EXECUTABLE  = elevator
 
-COMPILER    = clang
+COMPILER    = gcc
 CFLAGS      = -Wall -g -std=gnu11 -fsanitize=address
 LDFLAGS     = -fsanitize=address
 EXCLUDE     = '*test*'
