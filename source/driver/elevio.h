@@ -58,7 +58,7 @@ void elevio_stopLamp(int value);
  */
 int elevio_callButton(int floor, ButtonType button);
 /**
- * @brief elevio_floorSensor returns current floor, -1 between floors
+ * @brief elevio_floorSensor returns current floor, between 0 and 3 floors
  */
 int elevio_floorSensor(void);
 /**
