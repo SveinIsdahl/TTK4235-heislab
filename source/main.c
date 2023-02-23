@@ -9,42 +9,69 @@
  *2 queues, main queue for orders on hold, one for orders currently being exceuted. (Always do above algorithm if main queue gets larger or if currently excecuted queue is done
  * */
 
-enum elev_state {
-    invalid, // On startup when starting between floors
-    moving,  // When moving between floors
-    still,   // When still
-    idle     // When waiting for order 
-};
-
-/*All functions related to a struct, takes in a pointer to struct as first argument*/
-void add_order(order* ord){
-}
+enum {
+    stopped,    // Stop button pressed
+    invalid,    // On startup when starting between floors
+    moving_up,  // When moving between floors.
+    moving_down,// When moving between floors.
+    still_up,   // When on floor, but going to go up
+    still_down, // When on floor, but going to go down
+    idle        // When waiting for order 
+} elev_state;
 
 
 int main(){
 
     elevio_init();
-
-    int emptyList[4][3] = { 0 };
-    /*order check1 = {BUTTON_HALL_UP, 0};
-    order check2 = { BUTTON_HALL_DOWN, 2};
-    */
-    //printf(check1);
-    //printf(check2);
+    //Move into init-function
+    int orderList[N_FLOORS][N_BUTTONS] = {0};
+    registerOrder(orderList);
+    if(elevio_floorSensor() == -1) {
+        elev_state = invalid;
+    }
+    else {
+        elev_state = idle;
+    }
 
     while(1){
-        registerOrder(emptyList);
+        registerOrder(orderList);
+        switch (elev_state) {
+            case stopped:
+                while(elevio_stopButton()){
+                   //Clear stuff 
+                }
+                break;
+            case invalid:
+                if(elevio_floorSensor() != -1) {
+                    elev_state = idle;
+                    elevio_motorDirection(DIRN_STOP);
 
-        /*        
-        if(emptyList[0][0] == check1){
-            printf("knapp hall up i etasje 0 ble trykket");
-        }
+                }
+                elevio_motorDirection(DIRN_UP);
+                break;
+            case moving_up:
+                //Check if buttons further up are pressed and stop if they are
+                break;
+            case moving_down:
+                //-||-
+                break;
+            case still_up:
+                //move up after closing doors
+                break;
+            case still_down:
+                //move down after closing doors
+                break;
+            case idle:
+                //wait for order,TODO: also check obstruction
+                break;
+            default:
+                printf("In default");
+                break;
+        } 
 
-        if(emptyList[2][1] == check2){
-            printf("knapp hall down i etasje 3 ble trykket");
-        }
-        */
-        //nanosleep(&(struct timespec){0, 20*1000*1000}, NULL);
+
+
+        nanosleep(&(struct timespec){0, 20*1000*1000}, NULL);
     }
     
     
