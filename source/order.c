@@ -32,11 +32,11 @@ void registerOrder(int orderList[N_FLOORS][N_BUTTONS]){
         for (int type = 0 ; type < N_BUTTONS; type++ ){//hall_up,hall_down,cab
             ButtonType calledButton = (ButtonType)type;
             int isPressed = elevio_callButton(floor, calledButton);
-            orderList[floor][type] = isPressed;
-            elevio_buttonLamp(floor, type, isPressed);
+            orderList[floor][type] = orderList[floor][type] || isPressed;
+            elevio_buttonLamp(floor, type, orderList[floor][type]);
         }
     }
-    printOrders(orderList);
+//    printOrders(orderList);
 }
 
 //Only called in idle currently, therefore should check if we have multiple buttons pressed an give closest

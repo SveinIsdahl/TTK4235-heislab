@@ -12,9 +12,9 @@
  * */
 
 int orderList[N_FLOORS][N_BUTTONS] = {0};
-int toggledButtons[N_FLOORS][N_BUTTONS] = {0};
 int _currentFloor = -1; //Only use setter and getter, values from 0 to N_FLOORS*2-1. 
 int timer = 0;
+int stopped_btn = 0;
 enum {
     stopped,    // Stop button pressed
     invalid,    // On startup when starting between floors
@@ -42,38 +42,59 @@ int main(){
     while(1){
         registerOrder(orderList);
         floor = elevio_floorSensor();
+	stopped_btn = elevio_stopButton();
+	if(stopped) elevio_stopLamp(1);
         //Add orderList to 
         switch (elev_state) {
             case stopped:
-                memset(toggledButtons, 0, sizeof(toggledButtons));
+            	printf("stopped\n");
+		    memset(orderList, 0, sizeof(orderList));
+		elevio_stopLamp(1);
+		elevio_motorDirection(DIRN_STOP);
                 while(elevio_stopButton()){
                     if(floor != -1) {
-                        setTimer(3);
+			    //open door
+           //             setTimer(3);
                         //How to handle timer? In background, and continue state-machine?
                     }
                 }
+		elevio_stopLamp(0);
                 elev_state = idle;
                 break;
             case invalid: 
+		printf("invalid\n");
+		if(stopped_btn) {
+			elev_state = stopped;
+			break;
+
+		}
                 if(floor != -1) {
                     elevio_motorDirection(DIRN_STOP);
-                    break;
+                    elev_state = idle;
+		    break;
                 } else {
                     elevio_motorDirection(DIRN_UP);
                     break;
                 }
             case moving_up:
+		printf("moving_up\n");
                 if(floor == -1) break;
-                if(toggledButtons[floor][0] || toggledButtons[floor][1] || toggledButtons[floor][2]) {
+                if(orderList[floor][0] || orderList[floor][1] || orderList[floor][2]) {
                     elevio_motorDirection(DIRN_STOP);
                     elev_state = stationary_up;
                 }
                 break;
             case moving_down:
-                //-||-
+		printf("moving_down\n");
+                if(floor == -1) break;
+                if(orderList[floor][0] || orderList[floor][1] || orderList[floor][2]) {
+                    elevio_motorDirection(DIRN_STOP);
+                    elev_state = stationary_down;
+                }
                 break;
             case stationary_up:
-                memset(toggledButtons[floor], 0, sizeof toggledButtons[floor]);
+		printf("stationary up\n");
+                memset(orderList[floor], 0, sizeof orderList[floor]);
                 while(timer != 0) {
                     elevio_doorOpenLamp(floor);
                     if(elevio_stopButton()) {
@@ -84,7 +105,8 @@ int main(){
                 elev_state = moving_up;
                 break;
             case stationary_down:
-                memset(toggledButtons[floor], 0, sizeof toggledButtons[floor]);
+		printf("stationary_down");
+                memset(orderList[floor], 0, sizeof orderList[floor]);
                 while(timer != 0) {
                     elevio_doorOpenLamp(floor);
                     if(elevio_stopButton()) {
@@ -95,11 +117,15 @@ int main(){
                 elev_state = moving_down;
                 break;
             case idle:
+		printf("idle\n");
+		//Check orders
                 //wait for order,TODO: also check obstruction
-
+		if(stopped_btn) {
+			elev_state = stopped;
+		}
                 break;
             default:
-                printf("In default");
+                printf("In default\n");
                 break;
         } 
 
