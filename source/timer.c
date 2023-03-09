@@ -14,7 +14,6 @@ void setTime(float time){
 
 int checkTime(){
     //return (timer(NULL) - startTime);
-
     if((timer(NULL) - startTime) >= 3){
         return 1;
     } else{

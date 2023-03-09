@@ -39,5 +39,15 @@ void registerOrder(int orderList[N_FLOORS][N_BUTTONS]){
 //    printOrders(orderList);
 }
 
-//Only called in idle currently, therefore should check if we have multiple buttons pressed an give closest
-//Currently ignores if orderList uses stop or obstruction
+//Return 0 or 1
+int hasActiveOrder(int orderList[N_FLOORS][N_BUTTONS]) {
+    for (int floor = 0; floor < N_FLOORS; floor++){//floor 0-3
+        for (int type = 0 ; type < N_BUTTONS; type++ ){//hall_up,hall_down,cab
+            ButtonType calledButton = (ButtonType)type;
+            int isPressed = elevio_callButton(floor, calledButton);
+            if(isPressed) return 1;
+        }
+    }
+    return 0;
+}
+
