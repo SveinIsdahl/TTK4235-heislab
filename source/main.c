@@ -36,7 +36,6 @@ enum {
 int main() {
     //init stuff
     elevio_init();
-    registerOrder(orderList);
     if (elevio_floorSensor() == -1) {
         elev_state = invalid;
     } else {
@@ -78,6 +77,7 @@ int main() {
                     elev_state = stopped;
                     break;
                 }
+                current_floor = elevio_floorSensor();
                 if (current_floor != -1) {
                     elevio_motorDirection(DIRN_STOP);
                     elev_state = idle;
