@@ -45,7 +45,9 @@ int main() {
 
     while (1) {
         //Maybe move registerOrder to differnt states to have more fine grained control
-        registerOrder(orderList);
+        if(elev_state != invalid) {
+            registerOrder(orderList);
+        }
         current_floor = elevio_floorSensor();
         
         switch (elev_state) {
