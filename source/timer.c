@@ -1,23 +1,16 @@
-#include "timer.h"
-#include "driver/elevio.h"
-#include <stdio.h>
+#include <time.h>
 
-static int startTime = -1;
+time_t startTime; // global variable to store the start time of the timer
 
-void setTime(float time){
-
-    startTime = timer(NULL);
-    //sleep(waitingTime);
-
-
+// function to check how long is left of the timer
+int checkTimer() {
+    time_t now = time(NULL);
+    int elapsed = now - startTime;
+    int remaining = 3 - elapsed; // assuming the timer is 60 seconds long
+    return remaining;
 }
 
-int checkTime(){
-    //return (timer(NULL) - startTime);
-    if((timer(NULL) - startTime) >= 3){
-        return 1;
-    } else{
-        return 0;
-    }
-
+// function to create a new timer, resetting the timer if called again
+void setTimer() {
+    startTime = time(NULL);
 }
