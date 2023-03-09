@@ -48,31 +48,61 @@ int hasActiveOrder(int orders[N_FLOORS][N_BUTTONS]) {
     }
     return 0;
 }
-MotorDirection order_idle_getDirection(int orders[N_FLOORS][N_BUTTONS], int current_floor) {
-    if (current_floor == 3) {
-        return DIRN_DOWN;
-    }
-    if (current_floor == 0) {
-        return DIRN_UP;
-    }
 
-    // Incase multiple order at the same time
-    int closest_floor = 0;
-    int diff = 100;
-    for (int i = 0; i < N_FLOORS; i++) {
+MotorDirection order_idle_getDirection(int orders[N_FLOORS][N_BUTTONS], int current_floor, MotorDirection current_dir) {
+    int hasOrdersAbove = 0;
+    for (int i = current_floor + 1; i < N_FLOORS; i++) {
         if (orders[i][0] || orders[i][1] || orders[i][2]) {
-            if (abs(closest_floor - current_floor) < diff) {
-                diff = abs(closest_floor - current_floor);
-                closest_floor = i;
-            }
+            hasOrdersAbove = 1;
         }
     }
-    if (closest_floor - current_floor > 0) {
-        return DIRN_UP;
+
+    int hasOrdersBelow = 0;
+    for (int i = current_floor - 1; i >= 0; i--) {
+        if (orders[i][0] || orders[i][1] || orders[i][2]) {
+            hasOrdersBelow = 1;
+        }
     }
-    if (closest_floor - current_floor > 0) {
-        return DIRN_DOWN;
+
+    if (current_dir == DIRN_UP) {
+        // Continue in same direction if there exists orders above
+        if (hasOrdersAbove) {
+            return DIRN_UP;
+        } else if (hasOrdersBelow) {
+            return DIRN_DOWN;
+        } else {
+            return DIRN_STOP;
+        }
+    }
+
+    if (current_dir == DIRN_DOWN) {
+        if (hasOrdersBelow) {
+            return DIRN_UP;
+        } else if (hasOrdersAbove) {
+            return DIRN_DOWN;
+        } else {
+            return DIRN_STOP;
+        }
+    }
+    // No current direction => get closest order and start serving that
+    if (current_dir == DIRN_STOP) {
+        // Incase multiple order at the same time
+        int closest_floor = 0;
+        int diff = 100;
+        for (int i = 0; i < N_FLOORS; i++) {
+            if (orders[i][0] || orders[i][1] || orders[i][2]) {
+                if (abs(closest_floor - current_floor) < diff) {
+                    diff = abs(closest_floor - current_floor);
+                    closest_floor = i;
+                }
+            }
+        }
+        if (closest_floor - current_floor > 0) {
+            return DIRN_UP;
+        }
+        if (closest_floor - current_floor < 0) {
+            return DIRN_DOWN;
+        }
     }
     return DIRN_STOP;
 }
-
