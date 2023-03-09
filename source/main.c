@@ -77,7 +77,6 @@ int main() {
                     elev_state = stopped;
                     break;
                 }
-                current_floor = elevio_floorSensor();
                 if (current_floor != -1) {
                     elevio_motorDirection(DIRN_STOP);
                     elev_state = idle;
@@ -99,7 +98,6 @@ int main() {
                 break;
             case open_door:
                 elevio_doorOpenLamp(1);
-                elevio_floorIndicator(current_floor); //Maybe add -1 check here (FAT minus point for crashes)
                 setTimer();
                 while(checkTimer() > 0) {
                     if(elevio_stopButton()) {
@@ -121,7 +119,9 @@ int main() {
                 elevio_buttonLamp(current_floor, BUTTON_HALL_UP, 0);
                 elevio_buttonLamp(current_floor, BUTTON_HALL_DOWN, 0);
                 elevio_buttonLamp(current_floor, BUTTON_CAB, 0);
-
+                if(current_floor != -1) {
+                    elevio_floorIndicator(current_floor); //Maybe add -1 check here (FAT minus point for crashes)
+                }
                 if (elevio_stopButton()) {
                     elev_state = stopped;
                     break;

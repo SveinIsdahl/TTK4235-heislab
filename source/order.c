@@ -31,7 +31,7 @@ void registerOrder(int orders[N_FLOORS][N_BUTTONS]) {
             ButtonType calledButton = (ButtonType)type;
             int isPressed = elevio_callButton(floor, calledButton);
             orders[floor][type] = orders[floor][type] || isPressed;
-            elevio_buttonLamp(floor, type, orders[floor][type]);
+            
         }
     }
     //    printOrders(orders);
