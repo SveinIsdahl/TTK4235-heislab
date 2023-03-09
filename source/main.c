@@ -47,8 +47,7 @@ int main() {
         //Maybe move registerOrder to differnt states to have more fine grained control
         registerOrder(orderList);
         current_floor = elevio_floorSensor();
-        elevio_floorIndicator(current_floor);
-
+        
         switch (elev_state) {
             case stopped:
                 printf("stopped\n");
@@ -97,8 +96,8 @@ int main() {
                 current_dir = next_dir;
                 break;
             case open_door:
-                //clear orders on current floor, if door i opened 
                 elevio_doorOpenLamp(1);
+                elevio_floorIndicator(current_floor); //Maybe add -1 check here (FAT minus point for crashes)
                 setTimer();
                 while(checkTimer() > 0) {
                     if(elevio_stopButton()) {
