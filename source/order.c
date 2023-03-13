@@ -1,7 +1,6 @@
 #include "order.h"
 
 void printOrders(int orders[N_FLOORS][N_BUTTONS]) {
-    printf("HALL_UP HALL_DOWN CAB \n");
     for (int i = 0; i < 4; i++) {
         if (i == 0) {
             printf("1: ");
@@ -31,7 +30,6 @@ void registerOrder(int orders[N_FLOORS][N_BUTTONS]) {
             ButtonType calledButton = (ButtonType)type;
             int isPressed = elevio_callButton(floor, calledButton);
             orders[floor][type] = orders[floor][type] || isPressed;
-            
         }
     }
     //    printOrders(orders);
@@ -41,49 +39,32 @@ void registerOrder(int orders[N_FLOORS][N_BUTTONS]) {
 int hasActiveOrder(int orders[N_FLOORS][N_BUTTONS]) {
     for (int floor = 0; floor < N_FLOORS; floor++) {    // floor 0-3
         for (int type = 0; type < N_BUTTONS; type++) {  // hall_up,hall_down,cab
-            ButtonType calledButton = (ButtonType)type;
-            int isPressed = elevio_callButton(floor, calledButton);
+            int isPressed = orders[floor][type];
             if (isPressed) return 1;
         }
     }
     return 0;
 }
-
-MotorDirection order_idle_getDirection(int orders[N_FLOORS][N_BUTTONS], int current_floor, MotorDirection current_dir) {
-    int hasOrdersAbove = 0;
+int hasOrdersAbove(int orders[N_FLOORS][N_BUTTONS], int current_floor) {
+    int ordersAbove = 0;
     for (int i = current_floor + 1; i < N_FLOORS; i++) {
         if (orders[i][0] || orders[i][1] || orders[i][2]) {
-            hasOrdersAbove = 1;
+            ordersAbove = 1;
         }
     }
-
-    int hasOrdersBelow = 0;
+    return ordersAbove;
+}
+int hasOrdersBelow(int orders[N_FLOORS][N_BUTTONS], int current_floor) {
+    int orderBelow = 0;
     for (int i = current_floor - 1; i >= 0; i--) {
         if (orders[i][0] || orders[i][1] || orders[i][2]) {
-            hasOrdersBelow = 1;
+            orderBelow = 1;
         }
     }
-
-    if (current_dir == DIRN_UP) {
-        // Continue in same direction if there exists orders above
-        if (hasOrdersAbove) {
-            return DIRN_UP;
-        } else if (hasOrdersBelow) {
-            return DIRN_DOWN;
-        } else {
-            return DIRN_STOP;
-        }
-    }
-
-    if (current_dir == DIRN_DOWN) {
-        if (hasOrdersBelow) {
-            return DIRN_UP;
-        } else if (hasOrdersAbove) {
-            return DIRN_DOWN;
-        } else {
-            return DIRN_STOP;
-        }
-    }
+    return orderBelow;
+}
+//Will give back a direction,
+MotorDirection order_getDirection(int orders[N_FLOORS][N_BUTTONS], int current_floor, int prev_floor, MotorDirection current_dir) {
     // No current direction => get closest order and start serving that
     if (current_dir == DIRN_STOP) {
         // Incase multiple order at the same time
@@ -103,6 +84,39 @@ MotorDirection order_idle_getDirection(int orders[N_FLOORS][N_BUTTONS], int curr
         if (closest_floor - current_floor < 0) {
             return DIRN_DOWN;
         }
+        printf("Shold not be here\n");
+        return DIRN_STOP;
     }
+    
+    {
+        int ordersAbove = hasOrdersAbove(orders, current_floor);
+        int ordersBelow = hasOrdersBelow(orders, current_floor);
+
+        if (ordersAbove) printf("Has orders above \n");
+        if (ordersBelow) printf("Has orders below \n");
+        printf("Dir: %d\n", current_dir);
+        printOrders(orders);
+        if (current_dir == DIRN_UP) {
+            // Continue in same direction if there exists orders above
+            if (ordersAbove) {
+                return DIRN_UP;
+            } else if (ordersBelow) {
+                return DIRN_DOWN;
+            } else {
+                return DIRN_STOP;
+            }
+        }
+        if (current_dir == DIRN_DOWN) {
+            if (ordersBelow) {
+                return DIRN_UP;
+            } else if (ordersAbove) {
+                return DIRN_DOWN;
+            } else {
+                return DIRN_STOP;
+            }
+        }
+    }
+
+    printf("Should not be here 1\n");
     return DIRN_STOP;
 }
