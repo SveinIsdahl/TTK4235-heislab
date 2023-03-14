@@ -146,7 +146,7 @@ int main() {
                         break;
                     }
                     registerOrder(orderList);
-                    if (elevio_obstruction()) {
+                    if (!elevio_obstruction()) {
                         printf("Obstructed\n");
                         time = checkTimer();
                         printf("Before setTimer: %d\n", time);
@@ -178,7 +178,7 @@ int main() {
                     elevio_buttonLamp(current_floor, BUTTON_HALL_UP, 0);
                     elevio_buttonLamp(current_floor, BUTTON_HALL_DOWN, 0);
                     elevio_buttonLamp(current_floor, BUTTON_CAB, 0);
-                    elevio_floorIndicator(current_floor);  // Maybe add -1 check here (FAT minus point for crashes)
+                    elevio_floorIndicator(current_floor);
                 }
                
                 if (elevio_stopButton()) {
@@ -252,3 +252,7 @@ int main() {
     printf("Next dir = %d\n", dir);
 }
 */
+
+
+
+//TODO: Check if buttons pressed are same as moving direction
