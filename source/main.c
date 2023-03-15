@@ -169,9 +169,10 @@ int main() {
             case idle:
                 //This means we were in stopped state
                 if (current_floor == -1) {
-                    MotorDirection next_dir = getDirectionAfterStop();
+                    MotorDirection next_dir = order_getDirectionAfterStop(orderList, prev_floor, current_dir);
                     //No orders
                     if(next_dir == DIRN_STOP) {
+                        printf("Stopped between floors but no orders\n");
                         break;
                     }
                     else {
@@ -189,7 +190,7 @@ int main() {
                 if (order_hasActiveOrders(orderList)) {
                     printf("Got order\n");
                     // Elevator has been called on current floor
-                    if ((orderList[current_floor][0]) || (orderList[current_floor][1]) || (orderList[current_floor][2]) && current_floor != -1) {
+                    if (((orderList[current_floor][0]) || (orderList[current_floor][1]) || (orderList[current_floor][2])) && current_floor != -1) {
                         order_print(orderList);
                         printf("Order is on same floor (%d)\n", current_floor);
                         elev_state = open_door;

@@ -118,15 +118,36 @@ MotorDirection order_getDirection(int orders[N_FLOORS][N_BUTTONS], int current_f
     printf("Should not be here 1\n");
     return DIRN_STOP;
 }
+//Currently assumes only one order in orders (e.g gets closest)
 MotorDirection order_getDirectionAfterStop(int orders[N_FLOORS][N_BUTTONS], int prev_floor, MotorDirection dir) {
-    if(!order_hasActiveOrders(orders)) return DIRN_STOP;
-    MotorDirection current_dir;
-    
+    if(!order_hasActiveOrders(orders)) {
+        return DIRN_STOP;
+    }
+
+    int next_floor;
     if(dir == DIRN_DOWN) {
-
+        next_floor = prev_floor - 1;
+        if(order_hasOrdersAbove(orders, next_floor)) {
+            return DIRN_UP;
+        }
+        else if(order_hasOrdersBelow(orders, prev_floor)) {
+            return DIRN_DOWN;
+        }
+        else {
+            printf("Stopped error1\n");
+        }
     }
-    if(dir == DIRN_UP) {
-
+    else if(dir == DIRN_UP) {
+        next_floor = prev_floor + 1;
+        if(order_hasOrdersAbove(orders, prev_floor)) {
+            return DIRN_UP;
+        }
+        else if(order_hasOrdersBelow(orders, next_floor)) {
+            return DIRN_DOWN;
+        }
+        else {
+            printf("Stopped error2\n");
+        }
     }
-     
+    return DIRN_STOP; //Should not reach here
 }
