@@ -181,7 +181,9 @@ int main() {
                     }
                 }
                 lights_resetFloor(current_floor);
+                order_register(orderList);
                 elevio_floorIndicator(current_floor);
+                order_register(orderList);
                 if (elevio_stopButton()) {
                     elev_state = stopped;
                     break;
