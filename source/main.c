@@ -124,7 +124,7 @@ int main() {
             case open_door:
                 printf("Open_door\n");
                 
-                if(current_floor != 1) {
+                if(current_floor != -1) {
                     memset(orderList[current_floor], 0, sizeof orderList[current_floor]);
                 } else {
                     printf("Current floor on opendoor %d \n", current_floor);
