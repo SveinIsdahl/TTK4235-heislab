@@ -158,11 +158,12 @@ int main() {
                 }
                 break;
             case idle:
-                if (current_floor != -1) {
-                    lights_resetFloor(current_floor);
-                    elevio_floorIndicator(current_floor);
+                if (current_floor == -1) {
+                    printf("Current floor == -1 in idle\n");
+                    break;
                 }
-
+                lights_resetFloor(current_floor);
+                elevio_floorIndicator(current_floor);
                 if (elevio_stopButton()) {
                     elev_state = stopped;
                     break;
