@@ -44,7 +44,8 @@ int main() {
                 elevio_stopLamp(1);
 
                 elevio_motorDirection(DIRN_STOP);
-                current_dir = DIRN_STOP;
+                //If this is needed, uncomment but set global variable prev_dir == current_dir 
+                //current_dir = DIRN_STOP;
                 if (current_floor != -1) {
                     elevio_doorOpenLamp(1);
                     int stop = elevio_stopButton();
@@ -57,9 +58,6 @@ int main() {
                 }
                 while (elevio_stopButton()) {
                 }
-                // when going to idle there should be logic to find closest order first,
-                // Or go straight to moving, but set moving dir correctly and current floor to the one above (Might create c)
-                //current_floor = prev_floor;
                 elev_state = idle;
                 break;
             case invalid:
@@ -86,6 +84,8 @@ int main() {
                     break;
                 } else {
                     prev_floor = current_floor;
+                    
+                    //elevio_motorDirection(DIRN_STOP); This can be used to slow down at every floor to prevent skipping, should only be needed with bad HW
                 }
 
                 // Has an order on current floor and current direction is NOT STOP (STOP would indicate a proper stop)
@@ -110,6 +110,7 @@ int main() {
                 }
                 // Endestopp
                 if ((current_floor == 0 || current_floor == (N_FLOORS - 1)) && !order_hasActiveOrders(orderList)) {
+                    elevio_motorDirection(DIRN_STOP);
                     elev_state = idle;
                     break;
                 }
@@ -169,6 +170,9 @@ int main() {
                 //This means we were in stopped state
                 if (current_floor == -1) {
                     MotorDirection next_dir = order_getDirectionAfterStop(orderList, prev_floor, current_dir);
+                    //This is set here and not earlier because current_dir is used in above function to calculate position, so can't be DIRN_STOP
+                    current_dir = next_dir;
+
                     //No orders
                     if(next_dir == DIRN_STOP) {
                         printf("Stopped between floors but no orders\n");
