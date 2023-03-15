@@ -30,6 +30,7 @@ void order_register(int orders[N_FLOORS][N_BUTTONS]) {
             ButtonType calledButton = (ButtonType)type;
             int isPressed = elevio_callButton(floor, calledButton);
             orders[floor][type] = orders[floor][type] || isPressed;
+            elevio_buttonLamp(floor, type, isPressed);
         }
     }
     //    order_print(orders);
@@ -116,4 +117,16 @@ MotorDirection order_getDirection(int orders[N_FLOORS][N_BUTTONS], int current_f
 
     printf("Should not be here 1\n");
     return DIRN_STOP;
+}
+MotorDirection order_getDirectionAfterStop(int orders[N_FLOORS][N_BUTTONS], int prev_floor, MotorDirection dir) {
+    if(!order_hasActiveOrders(orders)) return DIRN_STOP;
+    MotorDirection current_dir;
+    
+    if(dir == DIRN_DOWN) {
+
+    }
+    if(dir == DIRN_UP) {
+
+    }
+     
 }

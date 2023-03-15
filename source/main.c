@@ -52,7 +52,7 @@ int main() {
                 if (current_floor != -1) {
                     elevio_doorOpenLamp(1);
                     int stop = elevio_stopButton();
-                    while (!stop) {
+                    while (stop) {
                         stop = elevio_stopButton();
                         printf("stop %d\n", stop);
                     }
@@ -87,10 +87,13 @@ int main() {
             case moving:
                 if (elevio_stopButton()) {
                     elev_state = stopped;
-                    prev_floor = current_floor;
                     break;
                 }
-                if (current_floor == -1) break;
+                if (current_floor == -1) {
+                    break;
+                } else {
+                    prev_floor = current_floor;
+                }
 
                 // Has an order on current floor and current direction is NOT STOP (STOP would indicate a proper stop)
                 // Stop if button in moving dir is pressed or cab
@@ -101,7 +104,7 @@ int main() {
                 }
                 // When we hit last order in current moving direction
                 // Should this be handled by idle?
-                elev_state = moving;
+                //elev_state = moving;
                 if (order_hasOrdersAbove(orderList, current_floor)) {
                     current_dir = DIRN_UP;
                     elevio_motorDirection(DIRN_UP);
@@ -113,7 +116,7 @@ int main() {
                     break;
                 }
                 // Endestopp
-                if ((current_floor == 0 || current_floor == (N_FLOORS - 1)) && order_hasActiveOrders(orderList)) {
+                if ((current_floor == 0 || current_floor == (N_FLOORS - 1)) && !order_hasActiveOrders(orderList)) {
                     elev_state = idle;
                     break;
                 }
@@ -134,7 +137,6 @@ int main() {
                         elev_state = stopped;
                         break;
                     }
-                    order_register(orderList);
                     if (!elevio_obstruction()) {
                         printf("Obstructed\n");
                         time = timer_check();
@@ -142,11 +144,18 @@ int main() {
                         timer_set();
                         time = timer_check();
                         printf("After timer_set: %d\n", time);
+                        //order_register(orderList);
+                    }
+                    order_register(orderList);
+                    //Should not be needed to check, but better to not have UB 
+                    if(current_floor >= 0) { 
+                        memset(orderList[current_floor], 0, sizeof orderList[current_floor]);
                     }
                     time = timer_check();
                 }
                 // Order served, clear doorlamp and buttons
                 elevio_doorOpenLamp(0);
+                order_print(orderList);
                 lights_resetFloor(current_floor);
 
                 // Go to idle if not orders above or below
@@ -158,9 +167,17 @@ int main() {
                 }
                 break;
             case idle:
+                //This means we were in stopped state
                 if (current_floor == -1) {
-                    printf("Current floor == -1 in idle\n");
-                    break;
+                    MotorDirection next_dir = getDirectionAfterStop();
+                    //No orders
+                    if(next_dir == DIRN_STOP) {
+                        break;
+                    }
+                    else {
+                        elev_state = moving;
+                        elevio_motorDirection(next_dir);
+                    }
                 }
                 lights_resetFloor(current_floor);
                 elevio_floorIndicator(current_floor);
@@ -172,7 +189,7 @@ int main() {
                 if (order_hasActiveOrders(orderList)) {
                     printf("Got order\n");
                     // Elevator has been called on current floor
-                    if ((orderList[current_floor][0]) || (orderList[current_floor][1]) || (orderList[current_floor][2])) {
+                    if ((orderList[current_floor][0]) || (orderList[current_floor][1]) || (orderList[current_floor][2]) && current_floor != -1) {
                         order_print(orderList);
                         printf("Order is on same floor (%d)\n", current_floor);
                         elev_state = open_door;
