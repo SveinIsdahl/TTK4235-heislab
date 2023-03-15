@@ -3,23 +3,23 @@
 void order_print(int orders[N_FLOORS][N_BUTTONS]) {
     for (int i = 0; i < 4; i++) {
         if (i == 0) {
-            printf("1: ");
+            //printf"1: ");
         } else if (i == 1) {
-            printf("2: ");
+            //printf"2: ");
         } else if (i == 2) {
-            printf("3: ");
+            //printf"3: ");
         } else if (i == 3) {
-            printf("4: ");
+            //printf"4: ");
         }
 
         for (int k = 0; k < 3; k++) {
             if (orders[i][k] == 0) {
-                printf("0");
+                //printf"0");
             } else if (orders[i][k] == 1) {
-                printf("1");
+                //printf"1");
             }
         }
-        printf("\n");
+        //printf"\n");
     }
 }
 
@@ -84,16 +84,20 @@ MotorDirection order_getDirection(int orders[N_FLOORS][N_BUTTONS], int current_f
         if (closest_floor - current_floor < 0) {
             return DIRN_DOWN;
         }
-        printf("Shold not be here\n");
+        //printf"Shold not be here\n");
         return DIRN_STOP;
     }
 
     int ordersAbove = order_hasOrdersAbove(orders, current_floor);
     int ordersBelow = order_hasOrdersBelow(orders, current_floor);
 
-    if (ordersAbove) printf("Has orders above \n");
-    if (ordersBelow) printf("Has orders below \n");
-    printf("Dir: %d\n", current_dir);
+    if (ordersAbove) {
+        //printf"Has orders above \n");
+    }
+    if (ordersBelow) {
+        //printf"Has orders below \n");
+    }
+    //printf"Dir: %d\n", current_dir);
     order_print(orders);
     //Continue in same direction
     if (current_dir == DIRN_UP) {
@@ -115,7 +119,7 @@ MotorDirection order_getDirection(int orders[N_FLOORS][N_BUTTONS], int current_f
         }
     }
 
-    printf("Should not be here 1\n");
+    //printf"Should not be here 1\n");
     return DIRN_STOP;
 }
 //Currently assumes only one order in orders (e.g gets closest)
@@ -134,7 +138,7 @@ MotorDirection order_getDirectionAfterStop(int orders[N_FLOORS][N_BUTTONS], int 
             return DIRN_DOWN;
         }
         else {
-            printf("Stopped error1\n");
+            //printf"Stopped error1\n");
         }
     }
     else if(dir == DIRN_UP) {
@@ -146,7 +150,7 @@ MotorDirection order_getDirectionAfterStop(int orders[N_FLOORS][N_BUTTONS], int 
             return DIRN_DOWN;
         }
         else {
-            printf("Stopped error2\n");
+            //printf"Stopped error2\n");
         }
     }
     return DIRN_STOP; //Should not reach here
