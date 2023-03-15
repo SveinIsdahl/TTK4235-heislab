@@ -65,7 +65,7 @@ int main() {
                 }
                 // when going to idle there should be logic to find closest order first,
                 // Or go straight to moving, but set moving dir correctly and current floor to the one above (Might create c)
-                current_floor = prev_floor;
+                //current_floor = prev_floor;
                 elev_state = idle;
                 break;
             case invalid:
@@ -123,7 +123,12 @@ int main() {
                 break;
             case open_door:
                 printf("Open_door\n");
-                memset(orderList[current_floor], 0, sizeof orderList[current_floor]);
+                
+                if(current_floor != 1) {
+                    memset(orderList[current_floor], 0, sizeof orderList[current_floor]);
+                } else {
+                    printf("Current floor on opendoor %d \n", current_floor);
+                }
                 order_print(orderList);
                 if (elevio_floorSensor() != 1) {
                     elevio_floorIndicator(elevio_floorSensor());
