@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 #include "order.h"
 #include "timer.h"
@@ -41,10 +40,7 @@ int main() {
 
         switch (elev_state) {
             case stopped:
-                //printf"stopped\n");
-                order_print(orderList);
                 memset(orderList, 0, sizeof(orderList));  // Need to double check this works, simulator not good for testing
-                order_print(orderList);
                 elevio_stopLamp(1);
 
                 elevio_motorDirection(DIRN_STOP);
@@ -54,9 +50,7 @@ int main() {
                     int stop = elevio_stopButton();
                     while (stop) {
                         stop = elevio_stopButton();
-                        //printf"stop %d\n", stop);
                     }
-                    //printf"stop %d\n", stop);
                     elevio_stopLamp(0);
                     elev_state = open_door;
                     break;
@@ -69,7 +63,6 @@ int main() {
                 elev_state = idle;
                 break;
             case invalid:
-                //printf"invalid\n");
                 if (elevio_stopButton()) {
                     elev_state = stopped;
                     break;
@@ -122,14 +115,22 @@ int main() {
                 }
                 break;
             case open_door:
-                //printf"Open_door\n");
                 
                 if(current_floor != -1) {
-                    memset(orderList[current_floor], 0, sizeof orderList[current_floor]);
+                    //
+                    orderList[current_floor][BUTTON_CAB] = 0;
+                    if(current_dir == DIRN_UP) {
+                        orderList[current_floor][BUTTON_HALL_UP] = 0;
+                    }
+                    else if(current_dir == DIRN_DOWN) {
+                        orderList[current_floor][BUTTON_HALL_DOWN] = 0;
+                    }
+                    else {
+                        memset(orderList[current_floor], 0, sizeof orderList[current_floor]);
+                    }
                 } else {
-                    //printf"Current floor on opendoor %d \n", current_floor);
+                    printf("Current floor on opendoor %d \n", current_floor);
                 }
-                order_print(orderList);
                 if (elevio_floorSensor() != 1) {
                     elevio_floorIndicator(elevio_floorSensor());
                 }
@@ -143,24 +144,17 @@ int main() {
                         break;
                     }
                     if (!elevio_obstruction()) {
-                        //printf"Obstructed\n");
-                        time = timer_check();
-                        //printf"Before timer_set: %d\n", time);
                         timer_set();
-                        time = timer_check();
-                        //printf"After timer_set: %d\n", time);
-                        //order_register(orderList);
                     }
                     order_register(orderList);
                     //Should not be needed to check, but better to not have UB 
-                    if(current_floor >= 0) { 
+                    if(current_floor != -1) { 
                         memset(orderList[current_floor], 0, sizeof orderList[current_floor]);
                     }
                     time = timer_check();
                 }
                 // Order served, clear doorlamp and buttons
                 elevio_doorOpenLamp(0);
-                order_print(orderList);
                 lights_resetFloor(current_floor);
 
                 // Go to idle if not orders above or below
@@ -177,7 +171,7 @@ int main() {
                     MotorDirection next_dir = order_getDirectionAfterStop(orderList, prev_floor, current_dir);
                     //No orders
                     if(next_dir == DIRN_STOP) {
-                        //printf"Stopped between floors but no orders\n");
+                        printf("Stopped between floors but no orders\n");
                         break;
                     }
                     else {
@@ -186,20 +180,15 @@ int main() {
                     }
                 }
                 lights_resetFloor(current_floor);
-                order_register(orderList);
                 elevio_floorIndicator(current_floor);
-                order_register(orderList);
                 if (elevio_stopButton()) {
                     elev_state = stopped;
                     break;
                 }
 
                 if (order_hasActiveOrders(orderList)) {
-                    //printf"Got order\n");
                     // Elevator has been called on current floor
                     if (((orderList[current_floor][0]) || (orderList[current_floor][1]) || (orderList[current_floor][2])) && current_floor != -1) {
-                        order_print(orderList);
-                        //printf"Order is on same floor (%d)\n", current_floor);
                         elev_state = open_door;
                         break;
                     }
@@ -207,21 +196,19 @@ int main() {
                     if (dir == DIRN_UP) {
                         elevio_motorDirection(dir);
                         current_dir = DIRN_UP;
-                        // prev_floor = current_floor; cehck if needed
                         elev_state = moving;
                         break;
                     }
                     if (dir == DIRN_DOWN) {
                         elevio_motorDirection(dir);
                         current_dir = DIRN_DOWN;
-                        // prev_floor = current_floor; check if needed
                         elev_state = moving;
                         break;
                     }
                 }
                 break;
             default:
-                //printf"Error, state is default\n");
+                printf("Error, state is default\n");
                 break;
         }
         // nanosleep(&(struct timespec){0, 20 * 1000 * 1000}, NULL);

@@ -39,7 +39,7 @@
 //              con_match(En3)
 //          )
 //      )
-//      //printf"%s, %d, %d\n", s, i, en);   // Should print "hello, 5, 1"
+//      printf()"%s, %d, %d\n", s, i, en);   // Should print "hello, 5, 1"
 //
 #define con_load(file, cases)                               \
 {                                                           \
@@ -55,7 +55,7 @@
             }                                               \
         }                                                   \
     } else {                                                \
-        //printf"Unable to open config file %s\n", file);    \
+        printf("Unable to open config file %s\n", file);    \
     }                                                       \
 }
 

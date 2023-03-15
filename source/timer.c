@@ -1,4 +1,3 @@
-#include <time.h>
 #include "timer.h"
 time_t startTime; // global variable to store the start time of the timer
 
