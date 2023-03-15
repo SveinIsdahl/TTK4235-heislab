@@ -12,7 +12,7 @@ static void lights_resetFloor(int floor);
 int orderList[N_FLOORS][N_BUTTONS] = {0};
 
 // To calculate posisiton after stop and direction
-int prev_floor; //Can never be -1
+int prev_floor;  // Can never be -1
 int current_floor;
 MotorDirection current_dir;
 
@@ -43,7 +43,7 @@ int main() {
             case stopped:
                 printf("stopped\n");
                 order_print(orderList);
-                memset(orderList, 0, sizeof(orderList)); //Need to double check this works, simulator not good for testing
+                memset(orderList, 0, sizeof(orderList));  // Need to double check this works, simulator not good for testing
                 order_print(orderList);
                 elevio_stopLamp(1);
 
@@ -63,8 +63,8 @@ int main() {
                 }
                 while (elevio_stopButton()) {
                 }
-                //when going to idle there should be logic to find closest order first,
-                //Or go straight to moving, but set moving dir correctly and current floor to the one above (Might create c)
+                // when going to idle there should be logic to find closest order first,
+                // Or go straight to moving, but set moving dir correctly and current floor to the one above (Might create c)
                 current_floor = prev_floor;
                 elev_state = idle;
                 break;
@@ -85,41 +85,44 @@ int main() {
                     break;
                 }
             case moving:
-                if (current_floor == -1) break;
-                if(elevio_stopButton()) {
+                if (elevio_stopButton()) {
                     elev_state = stopped;
                     prev_floor = current_floor;
                     break;
                 }
-                MotorDirection next_dir = order_getDirection(orderList, current_floor, prev_floor, current_dir);
-                //Has an order on current floor and current direction is NOT STOP (STOP would indicate a proper stop)
-                //if (((orderList[current_floor][0]) || (orderList[current_floor][1]) || (orderList[current_floor][2])) && current_dir != DIRN_STOP) {
-                //Stop if button in moving dir is pressed or cab
-                if((current_dir == DIRN_UP && orderList[current_floor][BUTTON_HALL_UP]) || (current_dir == DIRN_DOWN && orderList[current_floor][BUTTON_HALL_DOWN]) || (orderList[current_floor][BUTTON_CAB])) {
+                if (current_floor == -1) break;
+
+                // Has an order on current floor and current direction is NOT STOP (STOP would indicate a proper stop)
+                // Stop if button in moving dir is pressed or cab
+                if ((current_dir == DIRN_UP && orderList[current_floor][BUTTON_HALL_UP]) || (current_dir == DIRN_DOWN && orderList[current_floor][BUTTON_HALL_DOWN]) || (orderList[current_floor][BUTTON_CAB])) {
                     elev_state = open_door;
                     elevio_motorDirection(DIRN_STOP);
                     break;
                 }
-                else if(next_dir != DIRN_STOP) {
-                    elev_state = moving;
-                    if(order_hasOrdersAbove(orderList, current_floor)) {
-                        current_dir = DIRN_UP;
-                        elevio_motorDirection(DIRN_UP);
-                        break;
-                    }
-                    if(order_hasOrdersBelow(orderList, current_floor)) {
-                        current_dir = DIRN_DOWN;
-                        elevio_motorDirection(DIRN_DOWN);
-                        break;
-                    }
+                // When we hit last order in current moving direction
+                // Should this be handled by idle?
+                elev_state = moving;
+                if (order_hasOrdersAbove(orderList, current_floor)) {
+                    current_dir = DIRN_UP;
+                    elevio_motorDirection(DIRN_UP);
+                    break;
                 }
-                //printf("Should not be here 2\n");
+                if (order_hasOrdersBelow(orderList, current_floor)) {
+                    current_dir = DIRN_DOWN;
+                    elevio_motorDirection(DIRN_DOWN);
+                    break;
+                }
+                // Endestopp
+                if ((current_floor == 0 || current_floor == (N_FLOORS - 1)) && order_hasActiveOrders(orderList)) {
+                    elev_state = idle;
+                    break;
+                }
                 break;
             case open_door:
                 printf("Open_door\n");
                 memset(orderList[current_floor], 0, sizeof orderList[current_floor]);
                 order_print(orderList);
-                if(elevio_floorSensor() != 1) {
+                if (elevio_floorSensor() != 1) {
                     elevio_floorIndicator(elevio_floorSensor());
                 }
                 elevio_doorOpenLamp(1);
@@ -142,16 +145,15 @@ int main() {
                     }
                     time = timer_check();
                 }
-                //Order served, clear doorlamp and buttons
+                // Order served, clear doorlamp and buttons
                 elevio_doorOpenLamp(0);
                 lights_resetFloor(current_floor);
-                
-                //Go to idle if not orders above or below
-                if(!(order_hasOrdersAbove(orderList, current_floor) || order_hasOrdersBelow(orderList, current_floor))) {
+
+                // Go to idle if not orders above or below
+                if (!(order_hasOrdersAbove(orderList, current_floor) || order_hasOrdersBelow(orderList, current_floor))) {
                     current_dir = DIRN_STOP;
                     elev_state = idle;
-                }
-                else {
+                } else {
                     elev_state = moving;
                 }
                 break;
@@ -160,7 +162,7 @@ int main() {
                     lights_resetFloor(current_floor);
                     elevio_floorIndicator(current_floor);
                 }
-               
+
                 if (elevio_stopButton()) {
                     elev_state = stopped;
                     break;
@@ -179,14 +181,14 @@ int main() {
                     if (dir == DIRN_UP) {
                         elevio_motorDirection(dir);
                         current_dir = DIRN_UP;
-                        //prev_floor = current_floor; cehck if needed
+                        // prev_floor = current_floor; cehck if needed
                         elev_state = moving;
                         break;
                     }
                     if (dir == DIRN_DOWN) {
                         elevio_motorDirection(dir);
                         current_dir = DIRN_DOWN;
-                        //prev_floor = current_floor; check if needed
+                        // prev_floor = current_floor; check if needed
                         elev_state = moving;
                         break;
                     }
@@ -196,7 +198,7 @@ int main() {
                 printf("Error, state is default\n");
                 break;
         }
-        //nanosleep(&(struct timespec){0, 20 * 1000 * 1000}, NULL);
+        // nanosleep(&(struct timespec){0, 20 * 1000 * 1000}, NULL);
     }
 
     return 0;
@@ -216,5 +218,5 @@ static void lights_resetFloor(int floor) {
     elevio_buttonLamp(floor, BUTTON_HALL_DOWN, 0);
     elevio_buttonLamp(floor, BUTTON_CAB, 0);
 }
-//TODO: Check if buttons pressed are same as moving direction
-//Maybe bug when floor one has temp stop, light does not turn on
+// TODO: Check if buttons pressed are same as moving direction
+// Maybe bug when floor one has temp stop, light does not turn on
