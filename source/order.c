@@ -1,6 +1,6 @@
 #include "order.h"
 
-void printOrders(int orders[N_FLOORS][N_BUTTONS]) {
+void order_print(int orders[N_FLOORS][N_BUTTONS]) {
     for (int i = 0; i < 4; i++) {
         if (i == 0) {
             printf("1: ");
@@ -24,7 +24,7 @@ void printOrders(int orders[N_FLOORS][N_BUTTONS]) {
 }
 
 // Maybe change to a button function instead of order function to include stop and obstruction?
-void registerOrder(int orders[N_FLOORS][N_BUTTONS]) {
+void order_register(int orders[N_FLOORS][N_BUTTONS]) {
     for (int floor = 0; floor < N_FLOORS; floor++) {    // floor 0-3
         for (int type = 0; type < N_BUTTONS; type++) {  // hall_up,hall_down,cab
             ButtonType calledButton = (ButtonType)type;
@@ -32,11 +32,11 @@ void registerOrder(int orders[N_FLOORS][N_BUTTONS]) {
             orders[floor][type] = orders[floor][type] || isPressed;
         }
     }
-    //    printOrders(orders);
+    //    order_print(orders);
 }
 
 // Return 0 or 1
-int hasActiveOrder(int orders[N_FLOORS][N_BUTTONS]) {
+int order_hasActiveOrders(int orders[N_FLOORS][N_BUTTONS]) {
     for (int floor = 0; floor < N_FLOORS; floor++) {    // floor 0-3
         for (int type = 0; type < N_BUTTONS; type++) {  // hall_up,hall_down,cab
             int isPressed = orders[floor][type];
@@ -45,7 +45,7 @@ int hasActiveOrder(int orders[N_FLOORS][N_BUTTONS]) {
     }
     return 0;
 }
-int hasOrdersAbove(int orders[N_FLOORS][N_BUTTONS], int current_floor) {
+int order_hasOrdersAbove(int orders[N_FLOORS][N_BUTTONS], int current_floor) {
     int ordersAbove = 0;
     for (int i = current_floor + 1; i < N_FLOORS; i++) {
         if (orders[i][0] || orders[i][1] || orders[i][2]) {
@@ -54,7 +54,7 @@ int hasOrdersAbove(int orders[N_FLOORS][N_BUTTONS], int current_floor) {
     }
     return ordersAbove;
 }
-int hasOrdersBelow(int orders[N_FLOORS][N_BUTTONS], int current_floor) {
+int order_hasOrdersBelow(int orders[N_FLOORS][N_BUTTONS], int current_floor) {
     int orderBelow = 0;
     for (int i = current_floor - 1; i >= 0; i--) {
         if (orders[i][0] || orders[i][1] || orders[i][2]) {
@@ -63,7 +63,6 @@ int hasOrdersBelow(int orders[N_FLOORS][N_BUTTONS], int current_floor) {
     }
     return orderBelow;
 }
-//Will give back a direction,
 MotorDirection order_getDirection(int orders[N_FLOORS][N_BUTTONS], int current_floor, int prev_floor, MotorDirection current_dir) {
     // No current direction => get closest order and start serving that
     if (current_dir == DIRN_STOP) {
@@ -87,33 +86,31 @@ MotorDirection order_getDirection(int orders[N_FLOORS][N_BUTTONS], int current_f
         printf("Shold not be here\n");
         return DIRN_STOP;
     }
-    
-    {
-        int ordersAbove = hasOrdersAbove(orders, current_floor);
-        int ordersBelow = hasOrdersBelow(orders, current_floor);
 
-        if (ordersAbove) printf("Has orders above \n");
-        if (ordersBelow) printf("Has orders below \n");
-        printf("Dir: %d\n", current_dir);
-        printOrders(orders);
-        if (current_dir == DIRN_UP) {
-            // Continue in same direction if there exists orders above
-            if (ordersAbove) {
-                return DIRN_UP;
-            } else if (ordersBelow) {
-                return DIRN_DOWN;
-            } else {
-                return DIRN_STOP;
-            }
+    int ordersAbove = order_hasOrdersAbove(orders, current_floor);
+    int ordersBelow = order_hasOrdersBelow(orders, current_floor);
+
+    if (ordersAbove) printf("Has orders above \n");
+    if (ordersBelow) printf("Has orders below \n");
+    printf("Dir: %d\n", current_dir);
+    order_print(orders);
+    //Continue in same direction
+    if (current_dir == DIRN_UP) {
+        if (ordersAbove) {
+            return DIRN_UP;
+        } else if (ordersBelow) {
+            return DIRN_DOWN;
+        } else {
+            return DIRN_STOP;
         }
-        if (current_dir == DIRN_DOWN) {
-            if (ordersBelow) {
-                return DIRN_UP;
-            } else if (ordersAbove) {
-                return DIRN_DOWN;
-            } else {
-                return DIRN_STOP;
-            }
+    }
+    if (current_dir == DIRN_DOWN) {
+        if (ordersBelow) {
+            return DIRN_UP;
+        } else if (ordersAbove) {
+            return DIRN_DOWN;
+        } else {
+            return DIRN_STOP;
         }
     }
 

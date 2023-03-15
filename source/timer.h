@@ -1,5 +1,5 @@
 #pragma once
 #include <stdio.h>
 
-void setTimer();
-int checkTimer();
+void timer_set();
+int timer_check();
