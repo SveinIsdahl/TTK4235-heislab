@@ -167,3 +167,9 @@ void order_clearFloorOrders(int orders[N_FLOORS][N_BUTTONS], int floor, MotorDir
         memset(orders[floor], 0, sizeof orders[floor]);
     }
 }
+int order_hasOrder(int orders[N_FLOORS][N_BUTTONS], int floor) {
+    if(floor == -1) {
+        return 0;
+    }
+    return (orders[floor][0] || orders[floor][0] || orders[floor][0]);
+}

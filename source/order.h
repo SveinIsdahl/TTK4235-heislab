@@ -16,3 +16,4 @@ int order_hasOrdersAbove(int orders[N_FLOORS][N_BUTTONS], int current_floor);
 int order_hasOrdersBelow(int orders[N_FLOORS][N_BUTTONS], int current_floor);
 MotorDirection order_getDirectionAfterStop(int orders[N_FLOORS][N_BUTTONS], int prev_floor, MotorDirection dir);
 void order_clearFloorOrders(int orders[N_FLOORS][N_BUTTONS], int floor, MotorDirection dir);
+int order_hasOrder(int orders[N_FLOORS][N_BUTTONS], int floor);

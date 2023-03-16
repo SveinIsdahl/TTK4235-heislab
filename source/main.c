@@ -96,14 +96,14 @@ int main() {
 
                 
                 //Ex: Someone is at top, we moving up, no orders above them, we go down
-                if(current_dir == DIRN_UP && !order_hasOrdersAbove(orderList, current_floor)) {
+                if(current_dir == DIRN_UP && !order_hasOrdersAbove(orderList, current_floor), order_hasOrder(orderList, current_floor)) {
                     //order_clearFloorOrders(orderList, current_floor, DIRN_DOWN); //Because this is a special case where we would normally not clear the order
                     elev_state = open_door;
                     elevio_motorDirection(DIRN_STOP);
                     break;
                 }
 
-                if(current_dir == DIRN_DOWN && !order_hasOrdersBelow(orderList, current_floor)){
+                if(current_dir == DIRN_DOWN && !order_hasOrdersBelow(orderList, current_floor) && order_hasOrder(orderList, current_floor)){
                     //order_clearFloorOrders(orderList, current_floor, DIRN_UP); //Because this is a special case where we would normally not clear the order
                     elev_state = open_door;
                     elevio_motorDirection(DIRN_STOP);
@@ -150,8 +150,10 @@ int main() {
                     }
                     order_register(orderList);
                     time = timer_check();
+
                 }
-                order_clearFloorOrders(orderList, current_floor, current_dir);
+                //Clear entire floor
+                order_clearFloorOrders(orderList, current_floor, DIRN_STOP);
                 // Order served, clear doorlamp and buttons
                 elevio_doorOpenLamp(0);
 
