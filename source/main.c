@@ -8,7 +8,6 @@
 #include "timer.h"
 
 static void lights_reset();
-static void lights_resetFloor(int floor);
 int order_list[N_FLOORS][N_BUTTONS] = {0};
 
 // To calculate posisiton after stop and direction
@@ -110,6 +109,15 @@ int main() {
                     break;
                 }
 
+                if (order_hasOrdersAbove(order_list, current_floor) && current_dir == DIRN_UP) {
+                    current_dir = DIRN_UP;
+                    elevio_motorDirection(DIRN_UP);
+                    break;
+                } else if (order_hasOrdersBelow(order_list, current_floor)  && current_dir == DIRN_UP) {
+                    current_dir = DIRN_DOWN;
+                    elevio_motorDirection(DIRN_DOWN);
+                    break;
+                }
                 // Pri: low, standard elevator stuff, used to determine next direction if no special cases,
                 // should calcualte distance?
 
