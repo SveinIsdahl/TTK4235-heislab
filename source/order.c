@@ -155,11 +155,11 @@ void order_clearFloorOrders(int orders[N_FLOORS][N_BUTTONS], int floor, MotorDir
     orders[floor][BUTTON_CAB] = 0;
     elevio_buttonLamp(floor, BUTTON_CAB, 0);
 
-    if (dir == DIRN_UP) {
+    if (dir == DIRN_UP || (dir==DIRN_DOWN && !order_hasOrdersBelow(orders, floor))) {
         orders[floor][BUTTON_HALL_UP] = 0;
         elevio_buttonLamp(floor, BUTTON_HALL_UP, 0);
 
-    } else if (dir == DIRN_DOWN) {
+    } else if (dir == DIRN_DOWN || (dir==DIRN_UP && !order_hasOrdersAbove(orders, floor))) {
         orders[floor][BUTTON_HALL_DOWN] = 0;
         elevio_buttonLamp(floor, BUTTON_HALL_DOWN, 0);
 
