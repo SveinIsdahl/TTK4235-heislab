@@ -118,24 +118,30 @@ int main() {
                 break;
             case open_door:
                 //To prevent UB
+
                 if(current_floor != -1) {
                     //This clears correct orders, make func
                     orderList[current_floor][BUTTON_CAB] = 0;
+                    elevio_buttonLamp(current_floor, BUTTON_CAB, 0);
+
                     if(current_dir == DIRN_UP) {
                         orderList[current_floor][BUTTON_HALL_UP] = 0;
+                        elevio_buttonLamp(current_floor, BUTTON_HALL_UP, 0);
+
                     }
                     else if(current_dir == DIRN_DOWN) {
                         orderList[current_floor][BUTTON_HALL_DOWN] = 0;
+                        elevio_buttonLamp(current_floor, BUTTON_HALL_DOWN, 0);
+
                     }
                     else {
                         memset(orderList[current_floor], 0, sizeof orderList[current_floor]);
                     }
+                    
                 } else {
                     printf("Current floor on opendoor %d \n", current_floor);
                 }
-                if (current_floor != -1) {
-                    elevio_floorIndicator(current_floor);
-                }
+                elevio_floorIndicator(current_floor);
                 elevio_doorOpenLamp(1);
                 timer_set();
                 int time = timer_check();
@@ -157,7 +163,6 @@ int main() {
                 }
                 // Order served, clear doorlamp and buttons
                 elevio_doorOpenLamp(0);
-                lights_resetFloor(current_floor); //This should be a function which looks at current order and clears them, problem when up and down button is pressed
 
                 // Go to idle if not orders above or below
                 if (!(order_hasOrdersAbove(orderList, current_floor) || order_hasOrdersBelow(orderList, current_floor))) {
