@@ -1,3 +1,5 @@
+//Bug where if you got to bottom floor and press it again it goes to open door twice
+//Tiny bug if stop is pressed, then obstrution, then current floor is ordered during obstruction
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -88,6 +90,8 @@ int main() {
                 // Stop if button in moving dir is pressed or cab is pressed
                 if ((current_dir == DIRN_UP && order_list[current_floor][BUTTON_HALL_UP]) || (current_dir == DIRN_DOWN && order_list[current_floor][BUTTON_HALL_DOWN]) || (order_list[current_floor][BUTTON_CAB])) {
                     elev_state = open_door;
+                    //This clearing is the reason we remove both light when they are pressed
+                    //BEcause one elevator is used, everyone has to go on anyways
                     order_clearFloorOrders(order_list, current_floor, DIRN_STOP);
                     elevio_motorDirection(DIRN_STOP);
                     break;
@@ -131,7 +135,6 @@ int main() {
 
                 break;
             case open_door:
-                order_clearFloorOrders(order_list, current_floor, current_dir);
                 elevio_floorIndicator(current_floor);
                 elevio_doorOpenLamp(1);
                 timer_set();
@@ -148,6 +151,7 @@ int main() {
                     order_register(order_list);
                     time = timer_check();
                 }
+                order_clearFloorOrders(order_list, current_floor, current_dir);
                 elevio_doorOpenLamp(0);
                 // Go to idle if not orders above or below
                 if (!(order_hasOrdersAbove(order_list, current_floor) || order_hasOrdersBelow(order_list, current_floor))) {
