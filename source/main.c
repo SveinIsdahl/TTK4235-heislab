@@ -82,7 +82,6 @@ int main() {
                     break;
                 } else {
                     prev_floor = current_floor;
-                    // elevio_motorDirection(DIRN_STOP); This can be used to slow down at every floor to prevent skipping, should only be needed with bad HW
                 }
                 
                 // Pri: high beacuse we always want to pick up/let people of in moving direction
@@ -180,7 +179,6 @@ int main() {
                         break;
                     }
                 }
-                lights_resetFloor(current_floor);
                 elevio_floorIndicator(current_floor);
                 if (elevio_stopButton()) {
                     elev_state = stopped;
@@ -229,11 +227,6 @@ static void lights_reset() {
     }
     elevio_doorOpenLamp(0);
     elevio_stopLamp(0);
-}
-static void lights_resetFloor(int floor) {
-    elevio_buttonLamp(floor, BUTTON_HALL_UP, 0);
-    elevio_buttonLamp(floor, BUTTON_HALL_DOWN, 0);
-    elevio_buttonLamp(floor, BUTTON_CAB, 0);
 }
 // TODO: Check if buttons pressed are same as moving direction
 // Maybe bug when floor one has temp stop, light does not turn on
