@@ -86,7 +86,7 @@ int main() {
 
                 // Pri: high beacuse we always want to pick up/let people of in moving direction
                 // Stop if button in moving dir is pressed or cab is pressed
-                if ((current_dir == DIRN_UP && orderList[current_floor][BUTTON_HALL_UP]) || (current_dir == DIRN_DOWN && orderList[current_floor][BUTTON_HALL_DOWN]) || (orderList[current_floor][BUTTON_CAB])) {
+                if ((current_dir == DIRN_UP && orderList[current_floor][BUTTON_HALL_UP]) || (current_dir == DIRN_DOWN && orderList[current_floor][BUTTON_HALL_DOWN]) || (current_dir != DIRN_STOP && (orderList[current_floor][BUTTON_CAB]))) {
                     elev_state = open_door;
                     elevio_motorDirection(DIRN_STOP);
                     break;
