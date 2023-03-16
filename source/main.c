@@ -148,10 +148,9 @@ int main() {
                         timer_set();
                     }
                     order_register(orderList);
-                    //Should not be needed to check, but better to not have UB 
-                    order_clearFloorOrders(orderList, current_floor, current_dir);
                     time = timer_check();
                 }
+                order_clearFloorOrders(orderList, current_floor, current_dir);
                 // Order served, clear doorlamp and buttons
                 elevio_doorOpenLamp(0);
 
