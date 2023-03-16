@@ -110,7 +110,7 @@ int main() {
                     break;
                 }
                 // Endestopp
-                if ((current_floor == 0 || current_floor == (N_FLOORS - 1)) && !order_hasActiveOrders(orderList)) {
+                if ((current_floor == 0 || current_floor == (N_FLOORS - 1))) {
                     elevio_motorDirection(DIRN_STOP);
                     elev_state = idle;
                     break;
@@ -157,7 +157,7 @@ int main() {
                 }
                 // Order served, clear doorlamp and buttons
                 elevio_doorOpenLamp(0);
-                lights_resetFloor(current_floor);
+                lights_resetFloor(current_floor); //This should be a function which looks at current order and clears them, problem when up and down button is pressed
 
                 // Go to idle if not orders above or below
                 if (!(order_hasOrdersAbove(orderList, current_floor) || order_hasOrdersBelow(orderList, current_floor))) {
@@ -175,7 +175,6 @@ int main() {
 
                     //No orders
                     if(next_dir == DIRN_STOP) {
-                        printf("Stopped between floors but no orders\n");
                         break;
                     }
                     else {
