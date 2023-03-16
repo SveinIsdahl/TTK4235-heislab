@@ -104,7 +104,7 @@ int main() {
                     break;
                 }
 
-                if(current_dir == DIRN_DOWN && !order_hasOrdersBelow(orderList, current_floor) && order_hasOrder(orderList, current_floor) 
+                if(current_dir == DIRN_DOWN && !order_hasOrdersBelow(orderList, current_floor)
                 && (orderList[current_floor][BUTTON_CAB] || orderList[current_floor][BUTTON_HALL_DOWN])){
                     elev_state = open_door;
                     elevio_motorDirection(DIRN_STOP);
@@ -124,7 +124,7 @@ int main() {
                     elevio_motorDirection(DIRN_DOWN);
                     break;
                 }
-                /*
+                
                 //Pri: low because going to idle means we recalculate priority, not problem if we only have one way to go 
                 // Endestopp Maybe delete
                 if ((current_floor == 0 || current_floor == (N_FLOORS - 1))) {
@@ -132,7 +132,7 @@ int main() {
                     elev_state = idle;
                     break;
                 }
-                */
+                
                 break;
             case open_door:
                 order_clearFloorOrders(orderList, current_floor, current_dir);
