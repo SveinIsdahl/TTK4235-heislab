@@ -88,6 +88,7 @@ int main() {
                 // Stop if button in moving dir is pressed or cab is pressed
                 if ((current_dir == DIRN_UP && order_list[current_floor][BUTTON_HALL_UP]) || (current_dir == DIRN_DOWN && order_list[current_floor][BUTTON_HALL_DOWN]) || (order_list[current_floor][BUTTON_CAB])) {
                     elev_state = open_door;
+                    order_clearFloorOrders(order_list, current_floor, DIRN_STOP);
                     elevio_motorDirection(DIRN_STOP);
                     break;
                 }
