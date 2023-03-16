@@ -113,7 +113,7 @@ int main() {
                     current_dir = DIRN_UP;
                     elevio_motorDirection(DIRN_UP);
                     break;
-                } else if (order_hasOrdersBelow(order_list, current_floor)  && current_dir == DIRN_UP) {
+                } else if (order_hasOrdersBelow(order_list, current_floor) && current_dir == DIRN_DOWN) {
                     current_dir = DIRN_DOWN;
                     elevio_motorDirection(DIRN_DOWN);
                     break;
