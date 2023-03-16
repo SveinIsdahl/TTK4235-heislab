@@ -135,6 +135,10 @@ int main() {
 
                 break;
             case open_door:
+                if(current_floor == -1) {
+                    elev_state = moving;
+                    break;
+                }
                 elevio_floorIndicator(current_floor);
                 elevio_doorOpenLamp(1);
                 timer_set();
