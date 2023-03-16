@@ -82,10 +82,9 @@ int main() {
                     break;
                 } else {
                     prev_floor = current_floor;
-
                     // elevio_motorDirection(DIRN_STOP); This can be used to slow down at every floor to prevent skipping, should only be needed with bad HW
                 }
-
+                
                 // Pri: high beacuse we always want to pick up/let people of in moving direction
                 // Stop if button in moving dir is pressed or cab is pressed
                 if ((current_dir == DIRN_UP && order_list[current_floor][BUTTON_HALL_UP]) || (current_dir == DIRN_DOWN && order_list[current_floor][BUTTON_HALL_DOWN]) || (order_list[current_floor][BUTTON_CAB])) {
@@ -129,6 +128,7 @@ int main() {
                 //  Endestopp Maybe delete
                 if ((current_floor == 0 || current_floor == (N_FLOORS - 1))) {
                     elevio_motorDirection(DIRN_STOP);
+                    order_clearFloorOrders(order_list, current_floor, DIRN_STOP);
                     elev_state = idle;
                     break;
                 }
@@ -166,7 +166,6 @@ int main() {
                 if (current_floor == -1) {
                     MotorDirection next_dir = order_getDirectionAfterStop(order_list, prev_floor, current_dir);
                     // This is set here and not earlier because current_dir is used in above function to calculate position, so can't be DIRN_STOP
-
                     // No orders
                     if (next_dir == DIRN_STOP) {
                         break;
