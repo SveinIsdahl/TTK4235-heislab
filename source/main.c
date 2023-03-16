@@ -58,6 +58,7 @@ int main() {
                 }
                 while (elevio_stopButton()) {
                 }
+                elevio_stopLamp(0);
                 elev_state = idle;
                 break;
             case invalid:
@@ -116,9 +117,9 @@ int main() {
                 }
                 break;
             case open_door:
-                
+                //To prevent UB
                 if(current_floor != -1) {
-                    //
+                    //This clears correct orders, make func
                     orderList[current_floor][BUTTON_CAB] = 0;
                     if(current_dir == DIRN_UP) {
                         orderList[current_floor][BUTTON_HALL_UP] = 0;
@@ -132,8 +133,8 @@ int main() {
                 } else {
                     printf("Current floor on opendoor %d \n", current_floor);
                 }
-                if (elevio_floorSensor() != 1) {
-                    elevio_floorIndicator(elevio_floorSensor());
+                if (current_floor != -1) {
+                    elevio_floorIndicator(current_floor);
                 }
                 elevio_doorOpenLamp(1);
                 timer_set();
@@ -171,7 +172,6 @@ int main() {
                 if (current_floor == -1) {
                     MotorDirection next_dir = order_getDirectionAfterStop(orderList, prev_floor, current_dir);
                     //This is set here and not earlier because current_dir is used in above function to calculate position, so can't be DIRN_STOP
-                    current_dir = next_dir;
 
                     //No orders
                     if(next_dir == DIRN_STOP) {
@@ -179,8 +179,10 @@ int main() {
                         break;
                     }
                     else {
+                        current_dir = next_dir;
                         elev_state = moving;
                         elevio_motorDirection(next_dir);
+                        break;
                     }
                 }
                 lights_resetFloor(current_floor);
