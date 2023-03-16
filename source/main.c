@@ -61,10 +61,6 @@ int main() {
                 elev_state = idle;
                 break;
             case invalid:
-                if (elevio_stopButton()) {
-                    elev_state = stopped;
-                    break;
-                }
                 if (current_floor != -1) {
                     elevio_motorDirection(DIRN_STOP);
                     current_dir = DIRN_STOP;
@@ -88,26 +84,29 @@ int main() {
                     //elevio_motorDirection(DIRN_STOP); This can be used to slow down at every floor to prevent skipping, should only be needed with bad HW
                 }
 
-                // Has an order on current floor and current direction is NOT STOP (STOP would indicate a proper stop)
-                // Stop if button in moving dir is pressed or cab
-                if ((current_dir == DIRN_UP && orderList[current_floor][BUTTON_HALL_UP]) || (current_dir == DIRN_DOWN && orderList[current_floor][BUTTON_HALL_DOWN]) || (orderList[current_floor][BUTTON_CAB])) {
+                //Pri: high beacuse we always want to pick up/let people of in moving direction
+                //Stop if button in moving dir is pressed or cab is pressed
+                if ((current_dir == DIRN_UP && orderList[current_floor][BUTTON_HALL_UP]) 
+                || (current_dir == DIRN_DOWN && orderList[current_floor][BUTTON_HALL_DOWN]) 
+                || (orderList[current_floor][BUTTON_CAB])) {
                     elev_state = open_door;
                     elevio_motorDirection(DIRN_STOP);
                     break;
                 }
-                // When we hit last order in current moving direction
-                // Should this be handled by idle?
-                //elev_state = moving;
+
+                //Pri: mid, standard elevator stuff, used to determine next direction
                 if (order_hasOrdersAbove(orderList, current_floor)) {
                     current_dir = DIRN_UP;
                     elevio_motorDirection(DIRN_UP);
                     break;
                 }
-                if (order_hasOrdersBelow(orderList, current_floor)) {
+                else if (order_hasOrdersBelow(orderList, current_floor)) {
                     current_dir = DIRN_DOWN;
                     elevio_motorDirection(DIRN_DOWN);
                     break;
                 }
+
+                //Pri: low because going to idle means we recalculate priority, not problem if we only have one way to go 
                 // Endestopp
                 if ((current_floor == 0 || current_floor == (N_FLOORS - 1))) {
                     elevio_motorDirection(DIRN_STOP);
