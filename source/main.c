@@ -95,16 +95,17 @@ int main() {
                 }
 
                 
-                //Ex: Someone is at top, we moving up, no orders above them, we go down
-                if(current_dir == DIRN_UP && !order_hasOrdersAbove(orderList, current_floor), order_hasOrder(orderList, current_floor)) {
-                    //order_clearFloorOrders(orderList, current_floor, DIRN_DOWN); //Because this is a special case where we would normally not clear the order
+                //Ex: Someone is at top, we moving up, no orders above them, we go down 
+                //Could change from hasOrder to only checking cab and current direction (remeber to clear correct in door open) so that we do not pick up more p
+                if(current_dir == DIRN_UP && !order_hasOrdersAbove(orderList, current_floor) 
+                && (orderList[current_floor][BUTTON_CAB] || orderList[current_floor][BUTTON_HALL_UP])) {
                     elev_state = open_door;
                     elevio_motorDirection(DIRN_STOP);
                     break;
                 }
 
-                if(current_dir == DIRN_DOWN && !order_hasOrdersBelow(orderList, current_floor) && order_hasOrder(orderList, current_floor)){
-                    //order_clearFloorOrders(orderList, current_floor, DIRN_UP); //Because this is a special case where we would normally not clear the order
+                if(current_dir == DIRN_DOWN && !order_hasOrdersBelow(orderList, current_floor) && order_hasOrder(orderList, current_floor) 
+                && (orderList[current_floor][BUTTON_CAB] || orderList[current_floor][BUTTON_HALL_DOWN])){
                     elev_state = open_door;
                     elevio_motorDirection(DIRN_STOP);
                     break;
@@ -152,11 +153,7 @@ int main() {
                     time = timer_check();
 
                 }
-                //Clear entire floor
-                order_clearFloorOrders(orderList, current_floor, DIRN_STOP);
-                // Order served, clear doorlamp and buttons
                 elevio_doorOpenLamp(0);
-
                 // Go to idle if not orders above or below
                 if (!(order_hasOrdersAbove(orderList, current_floor) || order_hasOrdersBelow(orderList, current_floor))) {
                     current_dir = DIRN_STOP;
