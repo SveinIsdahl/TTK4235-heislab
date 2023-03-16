@@ -94,7 +94,24 @@ int main() {
                     break;
                 }
 
-                //Pri: mid, standard elevator stuff, used to determine next direction
+                //Ex: Someone is at top, we moving up, no orders above them, we go down
+                if(current_dir == DIRN_UP && !order_hasOrdersAbove(orderList, current_floor)) {
+                    order_clearFloorOrders(orderList, current_floor, DIRN_DOWN); //Because this is a special case where we would normally not clear the order
+                    elev_state = open_door;
+                    elevio_motorDirection(DIRN_STOP);
+                    break;
+                }
+
+                if(current_dir == DIRN_DOWN && !order_hasOrdersBelow(orderList, current_floor)){
+                    order_clearFloorOrders(orderList, current_floor, DIRN_UP); //Because this is a special case where we would normally not clear the order
+                    elev_state = open_door;
+                    elevio_motorDirection(DIRN_STOP);
+                    break;
+                }
+
+                //Pri: low, standard elevator stuff, used to determine next direction if no special cases, 
+                //should calcualte distance
+
                 if (order_hasOrdersAbove(orderList, current_floor)) {
                     current_dir = DIRN_UP;
                     elevio_motorDirection(DIRN_UP);
@@ -105,14 +122,15 @@ int main() {
                     elevio_motorDirection(DIRN_DOWN);
                     break;
                 }
-
+                /*
                 //Pri: low because going to idle means we recalculate priority, not problem if we only have one way to go 
-                // Endestopp
+                // Endestopp Maybe delete
                 if ((current_floor == 0 || current_floor == (N_FLOORS - 1))) {
                     elevio_motorDirection(DIRN_STOP);
                     elev_state = idle;
                     break;
                 }
+                */
                 break;
             case open_door:
                 order_clearFloorOrders(orderList, current_floor, current_dir);
@@ -175,6 +193,8 @@ int main() {
                         elev_state = open_door;
                         break;
                     }
+                    elev_state = moving;
+                    /*
                     MotorDirection dir = order_getDirection(orderList, current_floor, prev_floor, current_dir);
                     if (dir == DIRN_UP) {
                         elevio_motorDirection(dir);
@@ -188,6 +208,7 @@ int main() {
                         elev_state = moving;
                         break;
                     }
+                    */
                 }
                 break;
             default:

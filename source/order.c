@@ -63,6 +63,8 @@ int order_hasOrdersBelow(int orders[N_FLOORS][N_BUTTONS], int current_floor) {
     }
     return orderBelow;
 }
+
+/*Function not needed if its only used in idle and we know we never get more than one order at a time
 MotorDirection order_getDirection(int orders[N_FLOORS][N_BUTTONS], int current_floor, int prev_floor, MotorDirection current_dir) {
     // No current direction => get closest order and start serving that
     if (current_dir == DIRN_STOP) {
@@ -113,6 +115,8 @@ MotorDirection order_getDirection(int orders[N_FLOORS][N_BUTTONS], int current_f
     printf("Should not be here 1\n");
     return DIRN_STOP;
 }
+*/
+
 // Currently assumes only one order in orders (e.g gets closest)
 MotorDirection order_getDirectionAfterStop(int orders[N_FLOORS][N_BUTTONS], int prev_floor, MotorDirection dir) {
     if (!order_hasActiveOrders(orders)) {
