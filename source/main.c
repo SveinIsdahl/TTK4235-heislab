@@ -97,12 +97,14 @@ int main() {
                 if (current_dir == DIRN_UP && !order_hasOrdersAbove(orderList, current_floor)) {
                     order_clearFloorOrders(orderList, current_floor, DIRN_STOP);
                     elev_state = open_door;
+                    current_dir = DIRN_STOP;
                     elevio_motorDirection(DIRN_STOP);
                     break;
                 }
                 if (current_dir == DIRN_DOWN && !order_hasOrdersBelow(orderList, current_floor)) {
                     order_clearFloorOrders(orderList, current_floor, DIRN_STOP);
                     elev_state = open_door;
+                    current_dir = DIRN_STOP;
                     elevio_motorDirection(DIRN_STOP);
                     break;
                 }
