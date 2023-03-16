@@ -2,6 +2,7 @@
 #include "driver/elevio.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct {
     ButtonType btn;
@@ -14,3 +15,4 @@ MotorDirection order_getDirection(int orders[N_FLOORS][N_BUTTONS], int current_f
 int order_hasOrdersAbove(int orders[N_FLOORS][N_BUTTONS], int current_floor);
 int order_hasOrdersBelow(int orders[N_FLOORS][N_BUTTONS], int current_floor);
 MotorDirection order_getDirectionAfterStop(int orders[N_FLOORS][N_BUTTONS], int prev_floor, MotorDirection dir);
+void order_clearFloorOrders(int orders[N_FLOORS][N_BUTTONS], int floor, MotorDirection dir);

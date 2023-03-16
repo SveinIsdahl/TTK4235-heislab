@@ -1,4 +1,3 @@
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -117,30 +116,7 @@ int main() {
                 }
                 break;
             case open_door:
-                //To prevent UB
-
-                if(current_floor != -1) {
-                    //This clears correct orders, make func
-                    orderList[current_floor][BUTTON_CAB] = 0;
-                    elevio_buttonLamp(current_floor, BUTTON_CAB, 0);
-
-                    if(current_dir == DIRN_UP) {
-                        orderList[current_floor][BUTTON_HALL_UP] = 0;
-                        elevio_buttonLamp(current_floor, BUTTON_HALL_UP, 0);
-
-                    }
-                    else if(current_dir == DIRN_DOWN) {
-                        orderList[current_floor][BUTTON_HALL_DOWN] = 0;
-                        elevio_buttonLamp(current_floor, BUTTON_HALL_DOWN, 0);
-
-                    }
-                    else {
-                        memset(orderList[current_floor], 0, sizeof orderList[current_floor]);
-                    }
-                    
-                } else {
-                    printf("Current floor on opendoor %d \n", current_floor);
-                }
+                order_clearFloorOrders(orderList, current_floor, current_dir);
                 elevio_floorIndicator(current_floor);
                 elevio_doorOpenLamp(1);
                 timer_set();
@@ -156,9 +132,7 @@ int main() {
                     }
                     order_register(orderList);
                     //Should not be needed to check, but better to not have UB 
-                    if(current_floor != -1) { 
-                        memset(orderList[current_floor], 0, sizeof orderList[current_floor]);
-                    }
+                    order_clearFloorOrders(orderList, current_floor, current_dir);
                     time = timer_check();
                 }
                 // Order served, clear doorlamp and buttons

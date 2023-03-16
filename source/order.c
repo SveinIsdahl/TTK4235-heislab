@@ -90,7 +90,7 @@ MotorDirection order_getDirection(int orders[N_FLOORS][N_BUTTONS], int current_f
     int ordersAbove = order_hasOrdersAbove(orders, current_floor);
     int ordersBelow = order_hasOrdersBelow(orders, current_floor);
 
-    //Continue in same direction
+    // Continue in same direction
     if (current_dir == DIRN_UP) {
         if (ordersAbove) {
             return DIRN_UP;
@@ -113,37 +113,53 @@ MotorDirection order_getDirection(int orders[N_FLOORS][N_BUTTONS], int current_f
     printf("Should not be here 1\n");
     return DIRN_STOP;
 }
-//Currently assumes only one order in orders (e.g gets closest)
+// Currently assumes only one order in orders (e.g gets closest)
 MotorDirection order_getDirectionAfterStop(int orders[N_FLOORS][N_BUTTONS], int prev_floor, MotorDirection dir) {
-    if(!order_hasActiveOrders(orders)) {
+    if (!order_hasActiveOrders(orders)) {
         return DIRN_STOP;
     }
 
     int next_floor;
-    if(dir == DIRN_DOWN) {
+    if (dir == DIRN_DOWN) {
         next_floor = prev_floor - 1;
-        if(order_hasOrdersAbove(orders, next_floor)) {
+        if (order_hasOrdersAbove(orders, next_floor)) {
             return DIRN_UP;
-        }
-        else if(order_hasOrdersBelow(orders, prev_floor)) {
+        } else if (order_hasOrdersBelow(orders, prev_floor)) {
             return DIRN_DOWN;
-        }
-        else {
+        } else {
             printf("Stopped error1\n");
         }
-    }
-    else if(dir == DIRN_UP) {
+    } else if (dir == DIRN_UP) {
         next_floor = prev_floor + 1;
-        if(order_hasOrdersAbove(orders, prev_floor)) {
+        if (order_hasOrdersAbove(orders, prev_floor)) {
             return DIRN_UP;
-        }
-        else if(order_hasOrdersBelow(orders, next_floor)) {
+        } else if (order_hasOrdersBelow(orders, next_floor)) {
             return DIRN_DOWN;
-        }
-        else {
+        } else {
             printf("Stopped error2\n");
         }
     }
     printf("Should not reach here in stopped\n");
-    return DIRN_STOP; 
+    return DIRN_STOP;
+}
+//Also sets button lamps correct
+void order_clearFloorOrders(int orders[N_FLOORS][N_BUTTONS], int floor, MotorDirection dir) {
+    if(floor == -1) {
+        printf("Floor == -1\n");
+        return;
+    }
+    orders[floor][BUTTON_CAB] = 0;
+    elevio_buttonLamp(floor, BUTTON_CAB, 0);
+
+    if (dir == DIRN_UP) {
+        orders[floor][BUTTON_HALL_UP] = 0;
+        elevio_buttonLamp(floor, BUTTON_HALL_UP, 0);
+
+    } else if (dir == DIRN_DOWN) {
+        orders[floor][BUTTON_HALL_DOWN] = 0;
+        elevio_buttonLamp(floor, BUTTON_HALL_DOWN, 0);
+
+    } else {
+        memset(orders[floor], 0, sizeof orders[floor]);
+    }
 }
