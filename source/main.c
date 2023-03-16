@@ -94,14 +94,14 @@ int main() {
 
                 // Ex: Someone is at top, we moving up, no orders above them, we go down
                 // Could change from hasOrder to only checking cab and current direction (remeber to clear correct in door open) so that we do not pick up more p
-                if (current_dir == DIRN_UP && !order_hasOrdersAbove(orderList, current_floor)) {
+                if (current_dir == DIRN_UP && !order_hasOrdersAbove(orderList, current_floor && order_hasOrder(orderList, current_floor))) {
                     order_clearFloorOrders(orderList, current_floor, DIRN_STOP);
                     elev_state = open_door;
                     current_dir = DIRN_STOP;
                     elevio_motorDirection(DIRN_STOP);
                     break;
                 }
-                if (current_dir == DIRN_DOWN && !order_hasOrdersBelow(orderList, current_floor)) {
+                if (current_dir == DIRN_DOWN && !order_hasOrdersBelow(orderList, current_floor) && order_hasOrder(orderList, current_floor)) {
                     order_clearFloorOrders(orderList, current_floor, DIRN_STOP);
                     elev_state = open_door;
                     current_dir = DIRN_STOP;
