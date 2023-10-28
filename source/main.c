@@ -1,5 +1,3 @@
-//Bug where if you got to bottom floor and press it again it goes to open door twice
-//Tiny bug if stop is pressed, then obstrution, then current floor is ordered during obstruction
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -40,12 +38,10 @@ int main() {
 
         switch (elev_state) {
             case stopped:
-                memset(order_list, 0, sizeof(order_list));  // Need to double check this works, simulator not good for testing
+                memset(order_list, 0, sizeof(order_list));
                 elevio_stopLamp(1);
-
                 elevio_motorDirection(DIRN_STOP);
-                // If this is needed, uncomment but set global variable prev_dir == current_dir
-                // current_dir = DIRN_STOP;
+                
                 if (current_floor != -1) {
                     elevio_doorOpenLamp(1);
                     int stop = elevio_stopButton();
@@ -88,14 +84,12 @@ int main() {
                 if ((current_dir == DIRN_UP && order_list[current_floor][BUTTON_HALL_UP]) || (current_dir == DIRN_DOWN && order_list[current_floor][BUTTON_HALL_DOWN]) || (order_list[current_floor][BUTTON_CAB])) {
                     elev_state = open_door;
                     //This clearing is the reason we remove both light when they are pressed
-                    //BEcause one elevator is used, everyone has to go on anyways
+                    //Because one elevator is used, everyone has to go on anyways
                     order_clearFloorOrders(order_list, current_floor, DIRN_STOP);
                     elevio_motorDirection(DIRN_STOP);
                     break;
                 }
 
-                // Ex: Someone is at top, we moving up, no orders above them, we go down
-                // Could change from hasOrder to only checking cab and current direction (remeber to clear correct in door open) so that we do not pick up more p
                 if (current_dir == DIRN_UP && (!order_hasOrdersAbove(order_list, current_floor)) && order_hasOrder(order_list, current_floor)) {
                     order_clearFloorOrders(order_list, current_floor, DIRN_STOP);
                     elev_state = open_door;
@@ -118,9 +112,8 @@ int main() {
                     elevio_motorDirection(DIRN_DOWN);
                     break;
                 }
+                
                 // Pri: low, standard elevator stuff, used to determine next direction if no special cases,
-                // should calcualte distance?
-
                 if (order_hasOrdersAbove(order_list, current_floor)) {
                     current_dir = DIRN_UP;
                     elevio_motorDirection(DIRN_UP);
@@ -132,7 +125,6 @@ int main() {
                 }
 
                 // Pri: low because going to idle means we recalculate priority, not problem if we only have one way to go
-                //  Endestopp Maybe delete
                 if ((current_floor == 0 || current_floor == (N_FLOORS - 1))) {
                     elevio_motorDirection(DIRN_STOP);
                     order_clearFloorOrders(order_list, current_floor, DIRN_STOP);
@@ -177,7 +169,6 @@ int main() {
                 if (current_floor == -1) {
                     MotorDirection next_dir = order_getDirectionAfterStop(order_list, prev_floor, current_dir);
                     // This is set here and not earlier because current_dir is used in above function to calculate position, so can't be DIRN_STOP
-                    // No orders
                     if (next_dir == DIRN_STOP) {
                         break;
                     } else {
@@ -200,28 +191,12 @@ int main() {
                         break;
                     }
                     elev_state = moving;
-                    /*
-                    MotorDirection dir = order_getDirection(order_list, current_floor, prev_floor, current_dir);
-                    if (dir == DIRN_UP) {
-                        elevio_motorDirection(dir);
-                        current_dir = DIRN_UP;
-                        elev_state = moving;
-                        break;
-                    }
-                    if (dir == DIRN_DOWN) {
-                        elevio_motorDirection(dir);
-                        current_dir = DIRN_DOWN;
-                        elev_state = moving;
-                        break;
-                    }
-                    */
                 }
                 break;
             default:
                 printf("Error, state is default\n");
                 break;
         }
-        // nanosleep(&(struct timespec){0, 20 * 1000 * 1000}, NULL);
     }
 
     return 0;
@@ -236,5 +211,3 @@ static void lights_reset() {
     elevio_doorOpenLamp(0);
     elevio_stopLamp(0);
 }
-// TODO: Check if buttons pressed are same as moving direction
-// Maybe bug when floor one has temp stop, light does not turn on
